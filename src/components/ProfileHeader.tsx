@@ -1,3 +1,5 @@
+import { User } from 'lucide-react';
+
 interface ProfileHeaderProps {
   firstName?: string;
   lastName?: string;
@@ -23,7 +25,7 @@ export default function ProfileHeader({ firstName, lastName, email }: ProfileHea
             {firstName && lastName ? `${firstName} ${lastName}` : 'Account'}
           </h1>
           <p className="text-sm text-brand-600 mt-1">{email}</p>
-          <p className="text-xs text-brand-400 mt-1">👤 Member since {new Date().getFullYear()}</p>
+          <p className="text-xs text-brand-400 mt-1 flex items-center gap-1"><User className="w-3 h-3" /> Member since {new Date().getFullYear()}</p>
         </div>
       </div>
     </div>

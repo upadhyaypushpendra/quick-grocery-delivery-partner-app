@@ -1,225 +1,123 @@
-# Quick Grocery Delivery Partner App
+# QuickGrocery - Delivery Partner Frontend
 
-A modern React-based frontend application for delivery partners to manage orders, track deliveries, and monitor their earnings in real-time. Built with TypeScript, Vite, and Tailwind CSS for a fast, scalable, and responsive user experience.
+A React PWA for delivery partners to manage order pickups, track deliveries, share real-time location, and manage earnings.
 
 ## Features
 
-- **Order Management**: View and accept delivery orders with detailed information
-- **Real-time Delivery Tracking**: Track active deliveries with live location updates
-- **Wallet System**: Monitor earnings and transaction history
-- **Order History**: Access comprehensive delivery history and performance metrics
-- **Authentication**: Secure login and registration for delivery partners
-- **Location Tracking**: Automatic location tracking during active deliveries
-- **Responsive Design**: Mobile-first approach with Tailwind CSS
-- **PWA Support**: Progressive Web App capabilities for offline functionality
+- 📍 **Real-time Location Tracking** - GPS updates every 30 seconds
+- 🎯 **Order Management** - Accept/decline delivery requests via SSE
+- 📦 **Delivery Workflow** - 4-step status tracking (pickup → out for delivery → reached → delivered)
+- 💰 **Wallet System** - Real-time earnings tracking and balance management
+- 🔐 **Authentication** - Secure login/register with JWT tokens
+- 📱 **PWA** - Installable app with offline support
 
 ## Tech Stack
 
-### Frontend Framework & Build Tools
-
-- **React 19** - UI library
-- **TypeScript** - Static type checking
-- **Vite** - Next-generation frontend tooling
-- **Tailwind CSS** - Utility-first CSS framework
-- **PostCSS** - CSS transformations
-
-### State Management & Data Fetching
-
-- **Zustand** - Lightweight state management
-- **TanStack React Query (v5)** - Server state management and caching
-- **Axios** - HTTP client
-
-### Forms & Validation
-
-- **React Hook Form** - Performant form management
-- **Zod** - TypeScript-first schema validation
-- **@hookform/resolvers** - Integration layer for form validation
-
-### Routing & Navigation
-
-- **React Router DOM v6** - Client-side routing
-
-### UI & UX
-
-- **React Hot Toast** - Toast notifications
-
-### Development Tools
-
-- **ESLint** - Code linting
-- **TypeScript ESLint** - TypeScript-aware linting
-- **PWA Plugin** - Progressive Web App support
-- **Workbox** - Service worker utilities
+- **Frontend**: React 18 + Vite + TypeScript
+- **State Management**: Zustand + TanStack Query
+- **Real-time**: Server-Sent Events (SSE) for order requests & status updates
+- **Styling**: Tailwind CSS v4
+- **API Client**: Axios with automatic token refresh
+- **PWA**: vite-plugin-pwa + Workbox
 
 ## Project Structure
 
 ```
 src/
-├── components/           # Reusable React components
-│   ├── layout/          # Layout components (AppShell, Header)
-│   ├── ActiveDelivery.tsx
-│   ├── DeliveryPartnerRuntime.tsx
-│   ├── OrderRequestCard.tsx
-│   ├── OrderRequestListener.tsx
-│   └── ProfileHeader.tsx
-├── pages/               # Page components
-│   ├── auth/            # Authentication pages
-│   │   ├── LoginPage.tsx
-│   │   └── RegisterPage.tsx
-│   ├── HomePage.tsx
-│   ├── AccountPage.tsx
-│   └── DeliveryHistoryPage.tsx
-├── hooks/               # Custom React hooks
-│   ├── useAuth.ts
-│   ├── useLocationTracking.ts
-│   ├── useOrderRequests.ts
-│   ├── useOrders.ts
-│   ├── useOrderStatus.ts
-│   ├── useOrderTracking.ts
-│   └── useWallet.ts
-├── stores/              # Zustand stores (state management)
-│   ├── authStore.ts
-│   ├── locationStore.ts
-│   ├── orderStore.ts
-│   ├── uiStore.ts
-│   └── walletStore.ts
-├── lib/                 # Utilities & libraries
-│   ├── apiClient.ts     # API configuration
-│   ├── parsers.ts       # Data parsing utilities
-│   └── queryClient.ts   # React Query configuration
-├── constants/           # Application constants
-│   └── orderStatus.ts
-├── assets/              # Static assets
-├── App.tsx              # Root component
-├── main.tsx             # Application entry point
-└── index.css            # Global styles
+├── components/          # Reusable React components
+│   └── layout/         # Layout components (Navbar, AppShell)
+├── hooks/              # Custom React hooks for API calls
+├── pages/              # Page components for routes
+├── stores/             # Zustand state management
+├── lib/                # Utilities (apiClient, queryClient)
+├── assets/             # Images, icons
+├── App.tsx             # Router configuration
+└── main.tsx            # Entry point
 ```
 
-## Getting Started
-
-### Prerequisites
-
-- Node.js (v18 or higher recommended)
-- npm or yarn package manager
-
-### Installation
-
-1. Clone the repository
+## Installation
 
 ```bash
-git clone <repository-url>
-cd quick-grocery-delivery-partner-app
-```
-
-2. Install dependencies
-
-```bash
-npm install
-```
-
-3. Configure environment variables
-   Create a `.env` file in the root directory with necessary API endpoints:
-
-```
-VITE_API_BASE_URL=<your-api-endpoint>
-```
-
-### Development
-
-Start the development server:
-
-```bash
+cd dp-frontend
+npm install --legacy-peer-deps
 npm run dev
 ```
 
-The application will be available at `http://localhost:5173`
+The app will start at `http://localhost:5173` and proxy API calls to `http://localhost:3000`.
 
-### Building
+## Environment Variables
 
-Build for production:
+Create `.env.local` (copy from `.env.example`):
 
 ```bash
-npm run build
+VITE_API_URL=/api
+VITE_DEBUG=false
+VITE_LOCATION_UPDATE_INTERVAL_SECONDS=30
+VITE_LOCATION_TIMEOUT_SECONDS=10
+VITE_GEOLOCATION_ENABLED=true
 ```
 
-Preview the production build locally:
+## Routes
+
+- `/` - Home
+- `/auth/login` - Login page
+- `/auth/register` - Registration page
+- `/dashboard` - Active orders dashboard (protected)
+- `/delivery/:orderId` - Delivery tracking (protected)
+- `/wallet` - Earnings & wallet (protected)
+- `/account` - Profile & settings (protected)
+- `/history` - Delivery history (protected)
+
+## Development
 
 ```bash
+# Start dev server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
 npm run preview
 ```
 
-### Linting
+## Key Stores
 
-Run ESLint to check code quality:
+- **dpAuthStore** - Authentication state (user, token, wallet balance)
+- **locationStore** - Current location, tracking status
+- **orderStore** - Current order, queue, history
+- **walletStore** - Balance, earnings, transactions
 
-```bash
-npm run lint
-```
+## API Endpoints Used
 
-## Key Components
+### Auth
+- `POST /auth/login`
+- `POST /auth/register`
+- `POST /auth/logout`
+- `GET /auth/me`
+- `POST /auth/refresh`
 
-### Authentication
+### Location
+- `POST /api/delivery-partners/location`
 
-- Secure login and registration for delivery partners
-- Protected routes using `ProtectedRoute` component
-- Token-based authentication with `useAuth` hook
+### Orders
+- `GET /api/delivery-partners/order-requests` (SSE)
+- `POST /api/delivery-partners/orders/:id/accept`
+- `POST /api/delivery-partners/orders/:id/decline`
+- `POST /api/delivery-partners/orders/:id/status`
 
-### Order Management
+### Wallet
+- `GET /api/delivery-partners/wallet`
 
-- Real-time order request listening with `OrderRequestListener`
-- Order cards displaying delivery details
-- Order status tracking and updates
+## Implementation Phases
 
-### Location Tracking
+Phase 1: ✅ Project Setup
+Phase 2: Auth System
+Phase 3: Location Tracking
+Phase 4: Order Request System
+Phase 5: Delivery Tracking
+Phase 6: Wallet & Earnings
+Phase 7: Core Pages & Navigation
+Phase 8: Router Configuration
 
-- Background location tracking during deliveries
-- Real-time location updates to the server
-- Efficient battery usage with `useLocationTracking` hook
-
-### Wallet & Earnings
-
-- View current balance and transaction history
-- Track earnings from completed deliveries
-- Real-time wallet updates
-
-## API Integration
-
-The application uses Axios for HTTP requests with a centralized API client configuration in [lib/apiClient.ts](lib/apiClient.ts).
-
-Key endpoints include:
-
-- Authentication endpoints (login, register)
-- Order management endpoints
-- Location tracking endpoints
-- Wallet and earnings endpoints
-
-## Performance Optimizations
-
-- Code splitting with Vite
-- Image optimization
-- Lazy loading of routes
-- Efficient state management with Zustand
-- Server state caching with React Query
-- PWA support for offline capabilities
-
-## Browser Support
-
-- Chrome/Edge (latest)
-- Firefox (latest)
-- Safari (latest)
-- Mobile browsers (iOS Safari, Chrome Mobile)
-
-## Contributing
-
-1. Create a feature branch from `main`
-2. Make your changes following the existing code style
-3. Run linting: `npm run lint`
-4. Commit with clear messages
-5. Submit a pull request
-
-## License
-
-This project is proprietary and confidential.
-
-## Support
-
-For issues or questions, please contact the development team or open an issue in the project repository.
+See `.env.example` for detailed environment configuration options.

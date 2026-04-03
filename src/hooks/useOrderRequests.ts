@@ -1,10 +1,14 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useOrderStore } from '../stores/orderStore';
 import type { OrderRequest } from '../stores/orderStore';
 import { useAuthStore } from '../stores/authStore';
 import apiClient from '../lib/apiClient';
 import { toDateOrNow, toNumber, toOptionalNumber } from '../lib/parsers';
+import { refreshAccessToken } from '../lib/refreshAccessToken';
+
+const INITIAL_RETRY_DELAY = 2_000;
+const MAX_RETRY_DELAY = 30_000;
 
 interface OrderRequestsResponse {
   type: string;
@@ -51,43 +55,61 @@ const normalizeOrderRequest = (
 export const useOrderRequests = () => {
   const { setPendingOrders } = useOrderStore();
   const { accessToken } = useAuthStore();
+  const retryDelayRef = useRef(INITIAL_RETRY_DELAY);
+  const retryTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     if (!accessToken) return;
 
-    // EventSource doesn't support headers, so we pass token as query param
-    const eventSource = new EventSource(
-      `/api/order-requests/listen?token=${accessToken}`,
-    );
+    let eventSource: EventSource;
 
-    eventSource.onmessage = (event) => {
-      try {
-        const message: OrderRequestsResponse = JSON.parse(event.data);
+    const connect = () => {
+      const currentToken = useAuthStore.getState().accessToken;
+      if (!currentToken) return;
+      eventSource = new EventSource(`/api/order-requests/listen?token=${currentToken}`);
 
-        if (message.type === 'connected') {
-          console.log('✓ Connected to order request stream');
-        } else if (message.type === 'order_request' && message.data) {
-          const requests = Array.isArray(message.data)
-            ? message.data
-                .filter(isRecord)
-                .map(normalizeOrderRequest)
-              .filter(isOrderRequest)
-            : [];
-          setPendingOrders(requests);
-        } else if (message.type === 'error') {
-          console.error('Order stream error:', message.message);
+      eventSource.onmessage = (event) => {
+        try {
+          const message: OrderRequestsResponse = JSON.parse(event.data);
+
+          if (message.type === 'connected') {
+            retryDelayRef.current = INITIAL_RETRY_DELAY;
+          } else if (message.type === 'order_request' && message.data) {
+            const requests = Array.isArray(message.data)
+              ? message.data
+                  .filter(isRecord)
+                  .map(normalizeOrderRequest)
+                  .filter(isOrderRequest)
+              : [];
+            setPendingOrders(requests);
+          } else if (message.type === 'error') {
+            console.error('Order stream error:', message.message);
+          }
+        } catch (error) {
+          console.error('Failed to parse order message:', error);
         }
-      } catch (error) {
-        console.error('Failed to parse order message:', error);
-      }
+      };
+
+      eventSource.onerror = (error) => {
+        console.error('Order request stream error:', error);
+        eventSource.close();
+        refreshAccessToken()
+          .catch(() => {/* clearAuth + redirect handled inside refreshAccessToken */})
+          .finally(() => {
+            retryTimerRef.current = setTimeout(() => {
+              retryDelayRef.current = Math.min(retryDelayRef.current * 2, MAX_RETRY_DELAY);
+              connect();
+            }, retryDelayRef.current);
+          });
+      };
     };
 
-    eventSource.onerror = (error) => {
-      console.error('Order request stream error:', error);
-      eventSource.close();
-    };
+    connect();
 
-    return () => eventSource.close();
+    return () => {
+      clearTimeout(retryTimerRef.current);
+      eventSource?.close();
+    };
   }, [setPendingOrders, accessToken]);
 };
 

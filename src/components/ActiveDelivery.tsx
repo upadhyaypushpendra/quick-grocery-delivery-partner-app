@@ -4,10 +4,13 @@ import {
   DP_OUT_FOR_DELIVERY_DONE_STATUSES,
   DP_REACHED_STATUSES,
   ORDER_STATUS_ICONS,
+  ORDER_STATUS_ICON_FALLBACK,
   ORDER_STATUS_LABELS,
   type OrderStatus,
 } from '../constants/orderStatus';
 import { useMarkDelivered, useUpdateOrderStatus } from '../hooks/useOrderStatus';
+import { MapPin, Map, Check, X } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 interface ActiveDeliveryProps {
   order: {
@@ -87,7 +90,7 @@ export default function ActiveDelivery({ order, onDelivered, onRejected }: Activ
     const typedStatus = status as OrderStatus;
     return {
       label: ORDER_STATUS_LABELS[typedStatus] || status,
-      icon: ORDER_STATUS_ICONS[typedStatus] || '●',
+      Icon: (ORDER_STATUS_ICONS[typedStatus] || ORDER_STATUS_ICON_FALLBACK) as LucideIcon,
       color: statusColorMap[typedStatus] || 'gray',
     };
   };
@@ -106,7 +109,7 @@ export default function ActiveDelivery({ order, onDelivered, onRejected }: Activ
       {/* Status Header */}
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-2">
-          <span className="text-3xl">{statusInfo.icon}</span>
+          <statusInfo.Icon className="w-7 h-7" />
           <h2 className="text-2xl font-bold">{statusInfo.label}</h2>
         </div>
         <p className="text-sm font-semibold">Order #{order.id.slice(0, 8)}</p>
@@ -128,7 +131,7 @@ export default function ActiveDelivery({ order, onDelivered, onRejected }: Activ
         {/* Delivery Address */}
         {order.addressSnapshot && (
           <div className="pt-3 border-t border-gray-200">
-            <p className="text-xs text-gray-600 font-semibold mb-2">📍 Delivery Address</p>
+          <p className="text-xs text-gray-600 font-semibold mb-2 flex items-center gap-1"><MapPin className="w-3 h-3" /> Delivery Address</p>
             <p className="text-sm text-gray-700">
               {order.addressSnapshot.line1}
               {order.addressSnapshot.line2 && `, ${order.addressSnapshot.line2}`}
@@ -165,7 +168,7 @@ export default function ActiveDelivery({ order, onDelivered, onRejected }: Activ
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition"
           >
-            🗺️ Get Directions to Customer
+            <Map className="w-4 h-4" /> Get Directions to Customer
           </a>
         )}
 
@@ -198,7 +201,7 @@ export default function ActiveDelivery({ order, onDelivered, onRejected }: Activ
             disabled={isUpdating}
             className="flex-1 bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
           >
-            {markDeliveredMutation.isPending ? '✓ Marking Delivered...' : '✓ Mark Delivered'}
+            {markDeliveredMutation.isPending ? <span className="flex items-center justify-center gap-1"><Check className="w-4 h-4" /> Marking Delivered...</span> : <span className="flex items-center justify-center gap-1"><Check className="w-4 h-4" /> Mark Delivered</span>}
           </button>
           <button
             onClick={() => {
@@ -215,7 +218,7 @@ export default function ActiveDelivery({ order, onDelivered, onRejected }: Activ
             disabled={isUpdating}
             className="flex-1 bg-red-600 text-white py-3 rounded-lg font-bold hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
           >
-            {updateOrderStatus.isPending ? '✗ Marking Rejected...' : '✗ Mark Rejected'}
+            {updateOrderStatus.isPending ? <span className="flex items-center justify-center gap-1"><X className="w-4 h-4" /> Marking Rejected...</span> : <span className="flex items-center justify-center gap-1"><X className="w-4 h-4" /> Mark Rejected</span>}
           </button>
           </>
         )}

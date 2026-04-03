@@ -3,8 +3,6 @@ import { useAuthStore } from '../stores/authStore';
 import apiClient from '../lib/apiClient';
 
 interface RegisterRequest {
-  firstName: string;
-  lastName: string;
   identifier: string;
   role: 'delivery_partner';
 }
@@ -139,6 +137,26 @@ export const useMe = () => {
     },
     enabled: !!accessToken && !user,
     staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+/**
+ * Update profile (firstName, lastName)
+ */
+export const useUpdateProfile = () => {
+  const { user, setAuthState } = useAuthStore();
+  const accessToken = useAuthStore((s) => s.accessToken);
+
+  return useMutation({
+    mutationFn: async (data: { firstName: string; lastName: string }) => {
+      const response = await apiClient.patch('/users/profile', data);
+      return response.data;
+    },
+    onSuccess: (updatedUser) => {
+      if (user && accessToken) {
+        setAuthState({ ...user, ...updatedUser }, accessToken);
+      }
+    },
   });
 };
 

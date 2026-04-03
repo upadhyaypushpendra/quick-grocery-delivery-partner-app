@@ -6,6 +6,7 @@ import {
   toDateOrNow,
   toOptionalNumber,
 } from '../lib/parsers';
+import { MapPin, Truck, Loader2, Check, X } from 'lucide-react';
 
 interface OrderRequestCardProps {
   id: string;
@@ -116,13 +117,13 @@ export default function OrderRequestCard({
           <div className="text-xs space-y-1">
             {hasPickupCoords && (
               <p>
-                <span className="font-semibold">📍 Pickup:</span>{' '}
+                <span className="font-semibold flex items-center gap-1"><MapPin className="w-3 h-3" /> Pickup:</span>{' '}
                 {pickupLat.toFixed(4)}, {pickupLng.toFixed(4)}
               </p>
             )}
             {hasDeliveryCoords && (
               <p>
-                <span className="font-semibold">🚚 Delivery:</span>{' '}
+                <span className="font-semibold flex items-center gap-1"><Truck className="w-3 h-3" /> Delivery:</span>{' '}
                 {deliveryLat.toFixed(4)}, {deliveryLng.toFixed(4)}
               </p>
             )}
@@ -137,14 +138,14 @@ export default function OrderRequestCard({
           disabled={isExpired || acceptOrder.isPending}
           className="flex-1 bg-green-500 text-white py-2 rounded font-bold text-sm hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
         >
-          {acceptOrder.isPending ? '⏳ Accepting...' : '✓ Accept'}
+          {acceptOrder.isPending ? <span className="flex items-center justify-center gap-1"><Loader2 className="w-3 h-3 animate-spin" /> Accepting...</span> : <span className="flex items-center justify-center gap-1"><Check className="w-3 h-3" /> Accept</span>}
         </button>
         <button
           onClick={handleDecline}
           disabled={isExpired || declineOrder.isPending}
           className="flex-1 bg-red-500 text-white py-2 rounded font-bold text-sm hover:bg-red-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
         >
-          {declineOrder.isPending ? '⏳ Declining...' : '✕ Decline'}
+          {declineOrder.isPending ? <span className="flex items-center justify-center gap-1"><Loader2 className="w-3 h-3 animate-spin" /> Declining...</span> : <span className="flex items-center justify-center gap-1"><X className="w-3 h-3" /> Decline</span>}
         </button>
       </div>
 

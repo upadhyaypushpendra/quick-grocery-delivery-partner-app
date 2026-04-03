@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { useLogout } from '../../hooks/useAuth';
 import toast from 'react-hot-toast';
+import { ClipboardList, User, LogOut } from 'lucide-react';
 
 export default function Header() {
   const navigate = useNavigate();
@@ -79,7 +80,7 @@ export default function Header() {
                     }}
                     className="w-full text-left px-4 py-3 text-sm font-semibold text-brand-700 hover:bg-brand-50 border-b border-brand-100 flex items-center gap-2"
                   >
-                    📋 Delivery History
+                    <ClipboardList className="w-4 h-4" /> Delivery History
                   </button>
                   <button
                     onClick={() => {
@@ -88,14 +89,14 @@ export default function Header() {
                     }}
                     className="w-full text-left px-4 py-3 text-sm font-semibold text-brand-700 hover:bg-brand-50 border-b border-brand-100 flex items-center gap-2"
                   >
-                    👤 View Profile
+                    <User className="w-4 h-4" /> View Profile
                   </button>
                   <button
                     onClick={handleLogout}
                     disabled={logout.isPending}
                     className="w-full text-left px-4 py-3 text-sm font-semibold text-red-600 hover:bg-red-50 flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    🚪 {logout.isPending ? 'Logging out...' : 'Logout'}
+                    <LogOut className="w-4 h-4" /> {logout.isPending ? 'Logging out...' : 'Logout'}
                   </button>
                 </div>
               )}

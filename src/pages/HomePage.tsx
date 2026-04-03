@@ -6,6 +6,7 @@ import { useOrderTracking } from '../hooks/useOrderTracking';
 import { useLocationStore } from '../stores/locationStore';
 import OrderRequestListener from '../components/OrderRequestListener';
 import ActiveDelivery from '../components/ActiveDelivery';
+import { Truck, ClipboardList, Lightbulb } from 'lucide-react';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -51,7 +52,7 @@ export default function HomePage() {
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-brand-700">
-            Welcome back, {user?.firstName}! 👋
+            Welcome back, {user?.firstName}!
           </h1>
           <p className="text-brand-600 mt-1">
             {new Date().toLocaleDateString('en-US', {
@@ -88,7 +89,7 @@ export default function HomePage() {
 
         {/* Active Delivery */}
         <div className="mb-6">
-          <h2 className="text-xl font-bold text-brand-700 mb-3">🚚 Active Delivery</h2>
+          <h2 className="text-xl font-bold text-brand-700 mb-3 flex items-center gap-2"><Truck className="w-5 h-5" /> Active Delivery</h2>
           {deliveriesLoading ? (
             <div className="bg-white rounded-lg shadow-md p-4 text-brand-600">
               Loading delivery...
@@ -123,7 +124,7 @@ export default function HomePage() {
             className="bg-white rounded-lg shadow-md p-6 text-left hover:shadow-lg hover:border-brand-400 transition border-2 border-brand-200"
           >
             <div className="flex items-start gap-4">
-              <span className="text-3xl">📋</span>
+              <ClipboardList className="w-7 h-7 text-brand-500 flex-shrink-0" />
               <div>
                 <h3 className="font-bold text-brand-700">Delivery History</h3>
                 <p className="text-sm text-brand-600 mt-1">View previous and completed deliveries</p>
@@ -133,7 +134,7 @@ export default function HomePage() {
 
           {/* Info Card */}
           <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-lg">
-            <p className="text-sm font-semibold text-blue-700 mb-2">💡 Quick Tips:</p>
+            <p className="text-sm font-semibold text-blue-700 mb-2 flex items-center gap-1"><Lightbulb className="w-4 h-4" /> Quick Tips:</p>
             <ul className="text-xs text-blue-600 space-y-1">
               <li>✓ Keep location sharing enabled to receive more orders</li>
               <li>✓ Orders expire in 2 minutes - accept quickly to secure the delivery</li>
