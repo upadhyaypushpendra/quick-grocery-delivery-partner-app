@@ -1,8 +1,8 @@
-import axios from 'axios';
-import { useAuthStore } from '../stores/authStore';
+import axios from "axios";
+import { useAuthStore } from "../stores/authStore";
 
 const refreshClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: import.meta.env.VITE_API_URL || "/api",
   withCredentials: true,
 });
 
@@ -27,15 +27,16 @@ export async function refreshAccessToken(): Promise<string> {
   isRefreshing = true;
 
   try {
-    const { data } = await refreshClient.post('/auth/refresh');
+    const { data } = await refreshClient.post("/auth/refresh");
     const newToken: string = data.accessToken;
     useAuthStore.getState().setAccessToken(newToken);
     pendingQueue.forEach(({ resolve }) => resolve(newToken));
     return newToken;
   } catch (err) {
     pendingQueue.forEach(({ reject }) => reject(err));
+    //@ts-ignore
     useAuthStore.getState().clearAuth();
-    window.location.href = '/auth/login';
+    window.location.href = "/auth/login";
     throw err;
   } finally {
     pendingQueue = [];

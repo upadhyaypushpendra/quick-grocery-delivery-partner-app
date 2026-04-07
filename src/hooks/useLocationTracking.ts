@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react';
-import { useLocationStore, type Location } from '../stores/locationStore';
-import apiClient from '../lib/apiClient';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { getApiErrorMessage } from '../lib/parsers';
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
+import apiClient from "../lib/apiClient";
+import { getApiErrorMessage } from "../lib/parsers";
+import { useLocationStore, type Location } from "../stores/locationStore";
 
 const LOCATION_UPDATE_INTERVAL = 30 * 1000; // 30 seconds
 const LOCATION_TIMEOUT = 10 * 1000; // 10 seconds
@@ -12,7 +12,6 @@ const LOCATION_TIMEOUT = 10 * 1000; // 10 seconds
  */
 export const useLocationTracking = (enabled = true) => {
   const { setLocation, setTracking, setError } = useLocationStore();
-  const watchIdRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!enabled) {
@@ -21,7 +20,7 @@ export const useLocationTracking = (enabled = true) => {
     }
 
     if (!navigator.geolocation) {
-      setError('Geolocation is not supported by your browser');
+      setError("Geolocation is not supported by your browser");
       return;
     }
 
@@ -39,13 +38,14 @@ export const useLocationTracking = (enabled = true) => {
           setError(null);
         },
         (error) => {
-          let errorMsg = 'Failed to get location';
+          let errorMsg = "Failed to get location";
           if (error.code === error.PERMISSION_DENIED) {
-            errorMsg = 'Location permission denied. Please enable it in settings.';
+            errorMsg =
+              "Location permission denied. Please enable it in settings.";
           } else if (error.code === error.POSITION_UNAVAILABLE) {
-            errorMsg = 'Location information is unavailable.';
+            errorMsg = "Location information is unavailable.";
           } else if (error.code === error.TIMEOUT) {
-            errorMsg = 'Location request timed out.';
+            errorMsg = "Location request timed out.";
           }
           setError(errorMsg);
         },
@@ -77,7 +77,7 @@ export const useLocationTracking = (enabled = true) => {
 export const useUpdateLocation = () => {
   return useMutation({
     mutationFn: async (location: Location) => {
-      const response = await apiClient.post('/location', {
+      const response = await apiClient.post("/location", {
         latitude: location.latitude,
         longitude: location.longitude,
         accuracy: location.accuracy,
@@ -87,8 +87,8 @@ export const useUpdateLocation = () => {
     },
     onError: (error: unknown) => {
       console.error(
-        'Failed to update location:',
-        getApiErrorMessage(error, 'Unknown location update error'),
+        "Failed to update location:",
+        getApiErrorMessage(error, "Unknown location update error"),
       );
     },
   });
@@ -99,9 +99,9 @@ export const useUpdateLocation = () => {
  */
 export const useGetLocation = () => {
   return useQuery({
-    queryKey: ['location'],
+    queryKey: ["location"],
     queryFn: async () => {
-      const response = await apiClient.get('/location');
+      const response = await apiClient.get("/location");
       return response.data;
     },
     refetchInterval: 30 * 1000, // Refetch every 30 seconds
@@ -115,7 +115,7 @@ export const useGetLocation = () => {
 export const useStartTracking = () => {
   return useMutation({
     mutationFn: async () => {
-      const response = await apiClient.post('/location/start');
+      const response = await apiClient.post("/location/start");
       return response.data;
     },
   });
@@ -127,7 +127,7 @@ export const useStartTracking = () => {
 export const useStopTracking = () => {
   return useMutation({
     mutationFn: async () => {
-      const response = await apiClient.post('/location/stop');
+      const response = await apiClient.post("/location/stop");
       return response.data;
     },
   });

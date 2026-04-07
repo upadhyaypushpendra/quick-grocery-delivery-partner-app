@@ -22,7 +22,7 @@ export default function RegisterPage() {
   const [canResend, setCanResend] = useState(false);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: number;
     if (resendTimer > 0) {
       interval = setInterval(() => setResendTimer((prev) => prev - 1), 1000);
     } else if (resendTimer === 0 && step === 'otp') {
@@ -125,11 +125,10 @@ export default function RegisterPage() {
                   if (identifierError) setIdentifierError('');
                 }}
                 placeholder="9001234567"
-                className={`w-full px-4 py-2 border-2 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-600 ${
-                  identifierError
+                className={`w-full px-4 py-2 border-2 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-600 ${identifierError
                     ? 'border-red-300 bg-red-50'
                     : 'border-brand-200 bg-brand-50 focus:border-brand-400'
-                }`}
+                  }`}
               />
               {identifierError && <p className="text-red-600 text-sm mt-1">{identifierError}</p>}
             </div>
@@ -166,11 +165,10 @@ export default function RegisterPage() {
                 }}
                 placeholder="000000"
                 maxLength={6}
-                className={`w-full px-4 py-2 border-2 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-600 text-center text-2xl tracking-widest ${
-                  otpError
+                className={`w-full px-4 py-2 border-2 rounded-lg transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-600 text-center text-2xl tracking-widest ${otpError
                     ? 'border-red-300 bg-red-50'
                     : 'border-brand-200 bg-brand-50 focus:border-brand-400'
-                }`}
+                  }`}
               />
               {otpError && <p className="text-red-600 text-sm mt-1">{otpError}</p>}
             </div>
@@ -187,11 +185,10 @@ export default function RegisterPage() {
               type="button"
               onClick={handleResendOtp}
               disabled={!canResend || resendOtp.isPending}
-              className={`w-full px-4 py-3 rounded-lg font-semibold transition ${
-                canResend
+              className={`w-full px-4 py-3 rounded-lg font-semibold transition ${canResend
                   ? 'bg-brand-100 text-brand-700 hover:bg-brand-200'
                   : 'bg-gray-100 text-gray-500 cursor-not-allowed'
-              }`}
+                }`}
             >
               {canResend ? (resendOtp.isPending ? 'Resending...' : 'Resend OTP') : `Resend OTP in ${resendTimer}s`}
             </button>

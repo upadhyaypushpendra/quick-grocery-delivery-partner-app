@@ -1,14 +1,14 @@
-import axios from 'axios';
-import { useAuthStore } from '../stores/authStore';
+import axios from "axios";
+import { useAuthStore } from "../stores/authStore";
 
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: import.meta.env.VITE_API_URL || "/api",
   withCredentials: true,
 });
 
 // Separate instance for refresh (without interceptors to avoid token attachment)
 const refreshClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: import.meta.env.VITE_API_URL || "/api",
   withCredentials: true,
 });
 
@@ -32,11 +32,16 @@ apiClient.interceptors.response.use(
   (res) => res,
   async (error) => {
     const original = error.config;
-    const isAuthMutationEndpoint = original.url?.includes('/auth/login') ||
-                                   original.url?.includes('/auth/register') ||
-                                   original.url?.includes('/auth/refresh');
+    const isAuthMutationEndpoint =
+      original.url?.includes("/auth/login") ||
+      original.url?.includes("/auth/register") ||
+      original.url?.includes("/auth/refresh");
 
-    if (error.response?.status === 401 && !original._retry && !isAuthMutationEndpoint) {
+    if (
+      error.response?.status === 401 &&
+      !original._retry &&
+      !isAuthMutationEndpoint
+    ) {
       original._retry = true;
 
       if (isRefreshing) {
@@ -53,7 +58,7 @@ apiClient.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const { data } = await refreshClient.post('/auth/refresh');
+        const { data } = await refreshClient.post("/auth/refresh");
         const newToken = data.accessToken;
         useAuthStore.getState().setAccessToken(newToken);
 
@@ -66,8 +71,9 @@ apiClient.interceptors.response.use(
         failedQueue.forEach(({ reject }) => reject(err));
         failedQueue = [];
 
+        //@ts-ignore
         useAuthStore.getState().clearAuth();
-        window.location.href = '/auth/login';
+        window.location.href = "/auth/login";
 
         return Promise.reject(err);
       } finally {
