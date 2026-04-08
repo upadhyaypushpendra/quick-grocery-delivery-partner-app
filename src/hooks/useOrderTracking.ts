@@ -33,7 +33,8 @@ export function useOrderTracking(
       const currentToken = useAuthStore.getState().accessToken;
       if (!currentToken) return;
 
-      es = new EventSource(`/api/orders/${orderId}/events?token=${currentToken}`, {
+      const baseUrl = import.meta.env.VITE_API_URL ?? '/api';
+      es = new EventSource(`${baseUrl}/orders/${orderId}/events?token=${currentToken}`, {
         withCredentials: true,
       });
 

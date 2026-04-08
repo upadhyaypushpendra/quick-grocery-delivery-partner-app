@@ -66,7 +66,8 @@ export const useOrderRequests = () => {
     const connect = () => {
       const currentToken = useAuthStore.getState().accessToken;
       if (!currentToken) return;
-      eventSource = new EventSource(`/api/order-requests/listen?token=${currentToken}`);
+      const baseUrl = import.meta.env.VITE_API_URL ?? '/api';
+      eventSource = new EventSource(`${baseUrl}/order-requests/listen?token=${currentToken}`);
 
       eventSource.onmessage = (event) => {
         try {

@@ -79,7 +79,8 @@ export function useOrders() {
     const connect = () => {
       const currentToken = useAuthStore.getState().accessToken;
       if (!currentToken) return;
-      es = new EventSource(`/api/orders/assigned/stream?token=${currentToken}`);
+      const baseUrl = import.meta.env.VITE_API_URL ?? '/api';
+      es = new EventSource(`${baseUrl}/orders/assigned/stream?token=${currentToken}`);
 
       es.onmessage = (e) => {
         try {
