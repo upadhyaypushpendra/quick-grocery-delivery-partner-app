@@ -1,14 +1,17 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { VitePWA } from 'vite-plugin-pwa'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'prompt',
+      registerType: 'autoUpdate',
       includeAssets: ['favicon.png', 'icons/*.png'],
+      devOptions: {
+        enabled: true,
+      },
       manifest: {
         name: 'QuickGrocery - Delivery Partner',
         short_name: 'QG Delivery',
@@ -38,6 +41,8 @@ export default defineConfig({
         ],
       },
       workbox: {
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/api\//],
         runtimeCaching: [
           {
             urlPattern: /^https?:\/\/.*\/api\/products/,
@@ -72,4 +77,4 @@ export default defineConfig({
       },
     },
   },
-})
+});
